@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign</title>
+<style>
+        div{
+        position : absolute;
+        right : 10px;
+        top : 5px
+        }
+
+    </style>
+</head>
+<body>
+<div>
+
+    </div>
+<H2>Create Daily Progress Report</H2>
+    Event name :
+    <input type="text" id="work">
+     Image upload:
+    <input type="file" name="files[]" id="files" required>
+    <input type="hidden" name="url" id="url">
+    <button type="button" onclick="uploadimage()">Upload</button><br><br>
+    <button onclick="upload_firebase()">saved</button>
+</body>
+<script src="https://www.gstatic.com/firebasejs/7.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.10.0/firebase-storage.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+var firebaseConfig = {
+    apiKey: "AIzaSyBSIAwxO5geJSslxclj68G33dZ-yumOEMI",
+    authDomain: "mapstec-81290.firebaseapp.com",
+    databaseURL: "https://mapstec-81290.firebaseio.com",
+    projectId: "mapstec-81290",
+    storageBucket: "mapstec-81290.appspot.com",
+    messagingSenderId: "99396857968",
+    appId: "1:99396857968:web:d1023241ff1551546004b5",
+    measurementId: "G-85RHV43HWV"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  // Get a reference to the storage service, which is used to create references in your storage bucket
+  function uploadimage(){
+  var storage = firebase.storage();
+  var file = document.getElementById("files").files[0];
+  var storageRef = storage.ref();
+  var thisref = storageRef.child(file.name).put(file);
+  thisref.then(snapshot => snapshot.ref.getDownloadURL())
+  .then((url) => {
+    console.log(url);
+    $("#url").val(url);
+  })
+  .catch(console.error);
+    }
+    function upload_firebase(){
+        var _event = $('#work').val();
+        var url = $('#url').val();
+        console.log(_event,url)
+        $.ajax({
+            type:'POST',
+            url: "{% url 'fire' %}",
+            data:{
+                'event':_event,
+                'img':url
+            }
+        })
+    }
+    $.ajaxSetup({ 
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                     if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                         break;
+                     }
+                 }
+             }
+             return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     } 
+});
+
+
+</script>
+</html>
