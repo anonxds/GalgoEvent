@@ -34,13 +34,15 @@
 <!--close-top-Header-menu-->
 
 <div id="sidebar"><a href="#" class="visible-phone"><i class="icon icon-home"></i> Dashboard</a><ul>
-    <li class="active"><a href="index.html"><i class="icon icon-home"></i> <span>Dashboard</span></a> </li>
-    <li> <a href="charts.html"><i class="icon icon-signal"></i> <span>Charts &amp; graphs</span></a> </li>
+  <li class="active"><a href="{% url 'index' %}"><i class="icon icon-home"></i> <span>Home</span></a> </li>
+    <li class="active"><a href="{% url 'crear_evento' %}"><i class="icon icon-globe"></i> <span>Crear &amp; Eventos</span></a> </li>
+    <li> <a href="{% url 'ver_eventos' %}"><i class="icon icon-pencil"></i> <span>Editar &amp; Eventos</span></a> </li>
+    <li> <a href="{% url 'ver_eventos' %}"><i class="icon-info-sign"></i> <span>Ayuda</span></a> </li>
+
   </ul>
 </div>
 <div id="content">
   <div id="content-header">
-    <div id="breadcrumb"> <a href="index.html" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a></div>
   </div>
   <div class="container-fluid"> 
     <div class="row-fluid">
@@ -51,6 +53,7 @@
           </div>
           <div class="widget-content">
             <form action="" id="create_event">
+              {% csrf_token %}
             <h5>Paso 1: Nombra el evento</h5>
             <input id='titulo' maxlength="20" required>
             <hr>
@@ -75,7 +78,7 @@
                
             </select>
             <hr>
-            <button type="submit" class="btn btn-success">Crear!</button>
+            <button id="crear" type="submit" class="btn btn-success">Crear!</button>
           </form>
           </div>
         </div>
@@ -162,12 +165,12 @@ function readURL(input) {
     reader.onload = function(e) {
       $('#preview').attr('src', e.target.result);
       $('#v_preview').attr('src', e.target.result);
-
     }
     
     reader.readAsDataURL(input.files[0]);
   }
 }
+
 $("#files").change(function() {
   readURL(this);
 });               
@@ -186,8 +189,13 @@ $(function(){
 ;})
 
 $("#create_event").submit(function(event){
+  var delayInMilliseconds = 10000; //1 second
+  document.getElementById("crear").disabled = true;
+
     console.log("new event created");
     uploadimage()
+    event.preventDefault();
+    setTimeout(function() {
     let _titulo = $("#titulo").val();
     let _desc = $("#descripcion").val();
     let _escuela = $('#escuela').val()
@@ -197,6 +205,8 @@ $("#create_event").submit(function(event){
     let _db_path = route(_escuela,_ubica)
     console.log(route(_escuela,_ubica),url);
     event.preventDefault();
+
+  //your code to be executed after 1 second
     $.ajax({
             type:'POST',
             url: "{% url 'fb_crear' %}",
@@ -206,8 +216,13 @@ $("#create_event").submit(function(event){
                 'escuela':_escuela,
                 'ubicacion':_db_path,
                 'img':url
+            },success:function(data){
+              alert("Nuevo evento creado")
+              location.reload();
             }
         })
+      }, delayInMilliseconds);
+
 });
 
 function route(escuela,text){

@@ -21,8 +21,11 @@ class crear_evento(ListView):
     context_object_name = 'data'
     model = User
 
+class informacion(ListView):
+    pass
+
 class tablas(ListView):
-    template_name = 'tables.html'
+    template_name = 'buttons.html'
     context_object_name = 'data'
     model = User
 
@@ -36,15 +39,21 @@ def ver_eventos(request):
         print(user.val()['titulo'])
         print(user.val()['descripcion'])
         print(user.val()['img'])
-        data_dict.append({'id':user.key(),'header':user.val()['header'],'titulo':user.val()['titulo'],'descripcion':user.val()['descripcion'],'img':user.val()['img']})
-
+        data_dict.append({'id':user.key(),'escuela':"tomas_aquino",'header':user.val()['header'],'titulo':user.val()['titulo'],'descripcion':user.val()['descripcion'],'img':user.val()['img']})
     print(data_dict)
-
     context = {
         'data':data_dict
     }
     return render(request, 'ver_eventos.html', context)
 
+def ver_eventos_slot(request):
+    if request.is_ajax():
+        slot = request.POST.get('path')
+        user = db.child("tomas_aquino").child(slot).get()
+        data = {'id':user.key(),'escuela':"tomas_aquino",'header':user.val()['header'],'titulo':user.val()['titulo'],'descripcion':user.val()['descripcion'],'img':user.val()['img']}
+        return JsonResponse(data)
+    else:
+        return render(request, 'tables.html')
 
 def index(request):
     dict_cal1 = []
@@ -83,16 +92,35 @@ def index(request):
         'menu_2':dict_m_2,
         'calafornix_1':dict_cal1,
         'calafornix_2':dict_cal2,
-        'aulamagna_1':dict_au_1,
-        'aulamagna_2':dict_au_2,
+        'aulamagna_1':dict_am_1,
+        'aulamagna_2':dict_am_2,
         'audiovisual_1':dict_au_1,
         'audiovisual_2':dict_au_2
     }
 
     return render(request,"index-copy.html",context)
 
-
 def fb_crear_evento(request):
+    if request.is_ajax():
+        titulo = request.POST.get('titulo')
+        descripcion = request.POST.get('descripcion')
+        img = request.POST.get('img')
+        escuela = request.POST.get('escuela')
+        ubicacion = request.POST.get('ubicacion')
+        db = _firebase.database()
+        data = {
+            'titulo': titulo,
+            'descripcion': descripcion,
+            'img': img
+        }
+        print(img)
+        db.child(escuela).child(ubicacion).update(data)
+        return JsonResponse(data)
+
+    else:
+        return render(request, 'tables.html')
+
+def fb_editar_evento(request):
     if request.is_ajax():
         titulo = request.POST.get('titulo')
         descripcion = request.POST.get('descripcion')

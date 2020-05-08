@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'eventmanager.apps.EventmanagerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
+    'crispy_forms',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -117,6 +118,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+
+LOGIN_REDIRECT_URL = "index"
+
+LOGIN_URL = "login"
 
 STATIC_URL = '/static/'
 

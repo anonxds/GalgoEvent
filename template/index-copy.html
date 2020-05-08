@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {% load static %}
-
 <html lang="en">
 <head>
 <title>Maruti Admin</title>
@@ -27,31 +26,25 @@
 <!--top-Header-menu-->
 <div id="user-nav" class="navbar navbar-inverse">
   <ul class="nav">
-     <li class=""><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+     <li class=""><a title="" href="{% url 'logout' %}"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
   </ul>
 </div>
 
 <!--close-top-Header-menu-->
 
 <div id="sidebar"><a href="#" class="visible-phone"><i class="icon icon-home"></i> Dashboard</a><ul>
-    <li class="active"><a href="index.html"><i class="icon icon-home"></i> <span>Dashboard</span></a> </li>
-    <li> <a href="charts.html"><i class="icon icon-signal"></i> <span>Charts &amp; graphs</span></a> </li>
+  <li class="active"><a href="{% url 'index' %}"><i class="icon icon-home"></i> <span>Home</span></a> </li>
+    <li class="active"><a href="{% url 'crear_evento' %}"><i class="icon icon-globe"></i> <span>Crear &amp; Eventos</span></a> </li>
+    <li> <a href="{% url 'ver_eventos' %}"><i class="icon icon-pencil"></i> <span>Editar &amp; Eventos</span></a> </li>
+    <li> <a href="{% url 'ver_eventos' %}"><i class="icon-info-sign"></i> <span>Ayuda</span></a> </li>
+
   </ul>
 </div>
 <div id="content">
   <div id="content-header">
-    <div id="breadcrumb"> <a href="index.html" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a></div>
   </div>
   <div class="container-fluid">
-    <div class="quick-actions_homepage">
-    <ul class="quick-actions">
-          <li> <a href="#"> <i class="icon icon-dashboard"></i> Crear Evento</a> </li>
-          <li> <a href="#"> <i class="icon icon-pencil"></i> Editar Eventos </a> </li>
-          <li> <a href="#"> <i class="icon-dashboard"></i> Ayuda </a> </li>
-
-
-      </ul>
-   </div>
+   
    
     <hr>
     <div style="text-align: center;">
@@ -203,7 +196,7 @@
 </div>
 </div>
 <div class="row-fluid">
-  <div id="footer" class="span12"> 2012 &copy; Marutii Admin. Brought to you by <a href="http://themedesigner.in">Themedesigner.in</a> </div>
+  <div id="footer" class="span12">Disenado para ITT </div>
 </div>
 <script src="{% static 'js/excanvas.min.js'%}"></script> 
 <script src="{% static 'js/jquery.min.js'%}"></script> 

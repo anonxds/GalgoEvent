@@ -34,13 +34,15 @@
 <!--close-top-Header-menu-->
 
 <div id="sidebar"><a href="#" class="visible-phone"><i class="icon icon-home"></i> Dashboard</a><ul>
-    <li class="active"><a href="index.html"><i class="icon icon-home"></i> <span>Dashboard</span></a> </li>
-    <li> <a href="charts.html"><i class="icon icon-signal"></i> <span>Charts &amp; graphs</span></a> </li>
+  <li class="active"><a href="{% url 'index' %}"><i class="icon icon-home"></i> <span>Home</span></a> </li>
+    <li class="active"><a href="{% url 'crear_evento' %}"><i class="icon icon-globe"></i> <span>Crear &amp; Eventos</span></a> </li>
+    <li> <a href="{% url 'ver_eventos' %}"><i class="icon icon-pencil"></i> <span>Editar &amp; Eventos</span></a> </li>
+    <li> <a href="{% url 'ver_eventos' %}"><i class="icon-info-sign"></i> <span>Ayuda</span></a> </li>
+
   </ul>
 </div>
 <div id="content">
   <div id="content-header">
-    <div id="breadcrumb"> <a href="index.html" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a></div>
   </div>
   <div class="container-fluid"> 
     <div class="row-fluid">
@@ -51,47 +53,40 @@
           </div>
           <div class="widget-content">
             <div class="accordion" id="collapse-group">
+              <select id='id_slot' onchange="view_other_events()">
+                <option value="Seleccionar">Seleccionar</option>
                 {% for info in data %}
-
-                <div class="accordion-group widget-box">
-                    <div class="accordion-heading">
-                        <div class="widget-title">
-                            <a data-parent="#collapse-group" href="#{{info.id}}" data-toggle="collapse">
-                                <span class="icon"><i class="icon-ok"></i></span><h5>{{info.header}}</h5>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="collapse accordion-body" id="{{info.id}}">
-                        <div class="widget-content">
-                            
-                            <form action="" id="create_event">
-                                <div style="text-align: center;">
-                                    <h5>Titulo</h5>
-                                <input id='titulo' maxlength="20" required value="{{info.titulo}}">
-                             </div>
-                                <hr>
-                                <div style="text-align: center;">
-                                <input type="hidden" name="url" id="url" value="{{info.img}}">
-                                <img height="331" width="981" id="preview" src="{{info.img}}">
-                                <input type="file" name="files" id="files" accept="image/*"  required>
-                                </div>
-                                <div style="text-align: center;">
-                                <button class="btn btn-primary">Actualizar imagen</button>
-                            </div>
-                                <hr>
-                                <div style="text-align: center;">
-                                    <h5>Descripcion</h5>
-                                    <textarea style="width: 500px;" id='descripcion' required maxlength="200">{{info.descripcion}}</textarea>    
-                                    </div>
-                                <hr>
-                                <div style="text-align: center;">
-                                <button type="submit" class="btn btn-success">Guardar</button>
-                                </div>
-                              </form>
-                        </div>
-                    </div>
-                </div> 
+                <option value="{{info.id}}">{{info.header}}</option>
                 {% endfor %}
+            </select>
+            <form action="" id="create_event" style="visibility: hidden;"  >
+              <div style="text-align: center;">
+                  <h5>Titulo</h5>
+              <input id='titulo' maxlength="20" required value="{{info.titulo}}">
+           </div>
+              <hr>
+              <div style="text-align: center;">
+                <input type="hidden" name="id_slot" id="id_slot" value="{{info.id}}">
+                <input type="hidden" name="id_escuela" id="id_escuela" value="{{info.escuela}}">
+
+                <div id="image_preview">
+              <input type="hidden" name="url" id="url" value="{{info.img}}">
+              <img height="331" width="981" id="preview" src="{{info.img}}">
+              <input type="file" name="files" id="files" accept="image/*"  required>
+            </div>
+              </div>
+              <div style="text-align: center;">
+          </div>
+              <hr>
+              <div style="text-align: center;">
+                  <h5>Descripcion</h5>
+                  <textarea style="width: 500px;" id='descripcion' required maxlength="200">{{info.descripcion}}</textarea>    
+                  </div>
+              <hr>
+              <div style="text-align: center;">
+              <button type="submit" class="btn btn-success">Guardar</button>
+              </div>
+            </form>
 
             </div>
 
@@ -151,6 +146,7 @@ var firebaseConfig = {
 
 
 
+
 document.getElementById("titulo").onkeypress = function(e) {
     var chr = String.fromCharCode(e.which);
     if ("></\"".indexOf(chr) >= 0)
@@ -177,32 +173,23 @@ function readURL(input) {
 }
 $("#files").change(function() {
   readURL(this);
+
 });               
-var options = {
-    tomas_aquino: ["Menu Principal", "Calafornix", "Audio Visual","Aula Magna"],
-Otay: ["lugar1", "lugar2", "lugar3"],
-};
-$(function(){
-  $('#escuela').change(function() {
-    var x= $('#escuela').val();
-    $('#g_ubicacion').html("");
-    for(index in options[x]) {
-        $('#g_ubicacion').append('<option value="' + options[x][index] + '">' + options[x][index] + '</option>')
-    };
-  }).change();  
-;})
+
 
 $("#create_event").submit(function(event){
+  var delayInMilliseconds = 10000; //1 second
     console.log("new event created");
+    document.getElementById("crear").disabled = true;
     uploadimage()
+    event.preventDefault();
+    setTimeout(function() {
     let _titulo = $("#titulo").val();
     let _desc = $("#descripcion").val();
-    let _escuela = $('#escuela').val()
-    let _ubica = $( "#g_ubicacion option:selected" ).val();
+    let _escuela = $('#id_escuela').val()
+    let _ubica = $("#id_slot").val();
     let url = $('#url').val();
-    console.log(_ubica)
     let _db_path = route(_escuela,_ubica)
-    console.log(route(_escuela,_ubica),url);
     event.preventDefault();
     $.ajax({
             type:'POST',
@@ -211,32 +198,13 @@ $("#create_event").submit(function(event){
                 'titulo':_titulo,
                 'descripcion':_desc,
                 'escuela':_escuela,
-                'ubicacion':_db_path,
+                'ubicacion':_ubica,
                 'img':url
             }
         })
+        
+  }, delayInMilliseconds);
 });
-
-function route(escuela,text){
-    let _path;
-    if (escuela == "tomas_aquino") { 
-    switch(text){
-        case "Menu Principal":
-        _path = 'menu_principal'
-        break;
-        case "Calafornix":
-        _path = 'calafornix_1'
-        break;
-    }
-    }
-    return _path
-}
-$("#vista_previa").click(function(){
-    let _titulo = $("#titulo").val();
-    let _desc = $("#descripcion").val();
-    $("#v_titulo").text(_titulo)
-    $("#v_descripcion").text(_desc)
-})
 
 $.ajaxSetup({ 
      beforeSend: function(xhr, settings) {
@@ -262,23 +230,45 @@ $.ajaxSetup({
      } 
 });
 
-//for the preview
-const $source = document.querySelector('#titulo');
-const $result = document.querySelector('#v_titulo');
-const $source_d = document.querySelector('#descripcion');
-const $result_d = document.querySelector('#v_descripcion');
-const typeHandler_t = function(e) {
-  $result.innerHTML = e.target.value;
-}
-$source.addEventListener('input', typeHandler_t) 
-$source.addEventListener('propertychange', typeHandler_t)
 
-$(document).ready(function(){
-    $("#descripcion").on("input", function(){
-        // Print entered value in a div box
-        $("#v_descripcion").text($(this).val());
-    });
-});
+//new code
+function view_other_events(){
+  let slot = document.getElementById("id_slot").value;
+  if(slot == "Seleccionar"){
+    
+  }
+  else{ 
+  $.ajax({
+    type:"POST",
+    url: "{% url 'ver_evento' %}",
+    data:{
+      'path':slot
+    },
+    success:function(data){
+    $("#titulo").val(data.titulo);
+    $("#descripcion").val(data.descripcion);
+    $('#id_escuela').val(data.escuela)
+    $("#id_slot").val(data.id);
+    $('#image_preview').html(load_img(data.img));
+    }
+  })
+  if(slot == "Seleccionar"){
+    document.getElementById("create_event").style.visibility = 'hidden';
+  }else{
+    document.getElementById("create_event").style.visibility = 'visible';
+  }
+  }
+}
+
+function load_img(src){
+  let img_area;
+  img_area = (`
+  <input type="hidden" name="url" id="url" value="${src}">
+              <img height="331" width="981" id="preview" src="${src}">
+              <input type="file" name="files" id="files" accept="image/*"  required>
+  `)
+  return img_area
+}
 </script>
 </body>
 </html>
