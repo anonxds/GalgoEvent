@@ -22,7 +22,9 @@ class crear_evento(ListView):
     model = User
 
 class informacion(ListView):
-    pass
+    template_name = 'information.html'
+    context_object_name = 'data'
+    model = User
 
 class tablas(ListView):
     template_name = 'buttons.html'
@@ -113,7 +115,7 @@ def fb_crear_evento(request):
             'descripcion': descripcion,
             'img': img
         }
-        print(img)
+        print('this is my text ',escuela)
         db.child(escuela).child(ubicacion).update(data)
         return JsonResponse(data)
 
@@ -127,6 +129,7 @@ def fb_editar_evento(request):
         img = request.POST.get('img')
         escuela = request.POST.get('escuela')
         ubicacion = request.POST.get('ubicacion')
+
         db = _firebase.database()
         data = {
             'titulo': titulo,
