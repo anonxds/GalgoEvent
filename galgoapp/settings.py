@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pwa',
+    'fcm_django'
 ]
 
 MIDDLEWARE = [
@@ -116,8 +118,23 @@ USE_L10N = True
 USE_TZ = True
 
 
+
+FCM_DJANGO_SETTINGS = {
+        "APP_VERBOSE_NAME": "mapstec",
+         # default: _('FCM Django')
+        "FCM_SERVER_KEY": "AAAAFySDsHA:APA91bEiiWQDYOCUHc6NkZJLkaet51rz4DcQoqbWuyquXnwt3M-nodIDxpzZ9K2HuEuqYh4eQt2BCC2HGE_TNMRHMlEy6yyLeUup7_PTn0gMT3LFWUZ_WMafozWXKkTRlbG_ZXFuiUp9",
+         # true if you want to have only one active device per registered user at a time
+         # default: False
+        "ONE_DEVICE_PER_USER": False,
+         # devices to which notifications cannot be sent,
+         # are deleted upon receiving error response from FCM
+         # default: False
+        "DELETE_INACTIVE_DEVICES": True,
+}
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 
 LOGIN_REDIRECT_URL = "index"
 

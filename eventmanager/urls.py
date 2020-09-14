@@ -10,5 +10,6 @@ urlpatterns = [
     path('tablas/',views.tablas.as_view(),name='vertablas'),
     path('editar_evento/view/', views.ver_eventos_slot, name='ver_evento'),
     path('information/', views.informacion.as_view(), name='information'),
+    path('guardar-token/', views.guardar_token, name='guardar_token'),
 
 ]

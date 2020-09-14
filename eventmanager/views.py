@@ -1,9 +1,39 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import ListView
-from firebase import Firebase,firebase
 from django.contrib.auth.models import User
 # Create your views here.
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse,HttpResponseBadRequest
+from django.core import serializers
+import json
+from fcm_django.models import FCMDevice
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def guardar_token(request):
+    print("dsd")
+    _devide = FCMDevice.objects.filter(active=True)
+    _devide.send_message(title="title", body="desciprfs")
+    body = request.body.decode('utf-8')
+    bodyDict = json.loads(body)
+
+    token = bodyDict['token']
+
+    existe = FCMDevice.objects.filter(registration_id = token,active=True)
+    if len(existe) > 0:
+        return HttpResponseBadRequest(json.dumps({"mensaje":"token"}))
+    device = FCMDevice()
+    device.registration_id = token
+    device.active = True
+
+    if request.user.is_authenticated:
+        device.user = request.user
+
+    device.save()
+
+    return HttpResponse(json.dumps({"mensaje": "token"}))
 
 
 Config = {
@@ -13,8 +43,8 @@ Config = {
         "storageBucket": "mapstec-81290.appspot.com",
         "measurementId": "G-85RHV43HWV"
     }
-_firebase = Firebase(Config)
-db = _firebase.database()
+_firebase = None
+db = None
 
 class crear_evento(ListView):
     template_name = 'crear_evento.html'
@@ -58,46 +88,7 @@ def ver_eventos_slot(request):
         return render(request, 'tables.html')
 
 def index(request):
-    dict_cal1 = []
-    dict_cal2 = []
-    dict_au_1 = []
-    dict_au_2 = []
-    dict_am_1 = []
-    dict_am_2 = []
-    dict_m_1 = []
-    dict_m_2 = []
-
-    calafornix_1 = db.child("tomas_aquino").child("calafornix_1").get()
-    calafornix_2 = db.child("tomas_aquino").child("calafornix_2").get()
-    audiovisual_1 = db.child("tomas_aquino").child("audiovisual_1").get()
-    audiovisual_2 = db.child("tomas_aquino").child("audiovisual_2").get()
-    aulamagna_1 = db.child("tomas_aquino").child("aula_magna_1").get()
-    aulamagna_2 = db.child("tomas_aquino").child("aula_magna_2").get()
-    menu_principal_1 = db.child("tomas_aquino").child("menu_principal_1").get()
-    menu_principal_2 = db.child("tomas_aquino").child("menu_principal_2").get()
-
-    dict_cal1.append({'titulo':calafornix_1.val()['titulo'],'descripcion':calafornix_1.val()['descripcion'],'img':calafornix_1.val()['img']})
-    dict_cal2.append({'titulo':calafornix_2.val()['titulo'],'descripcion':calafornix_2.val()['descripcion'],'img':calafornix_2.val()['img']})
-    dict_au_1.append({'titulo':audiovisual_1.val()['titulo'],'descripcion':audiovisual_1.val()['descripcion'],'img':audiovisual_1.val()['img']})
-    dict_au_2.append({'titulo':audiovisual_2.val()['titulo'],'descripcion':audiovisual_2.val()['descripcion'],'img':audiovisual_2.val()['img']})
-    dict_am_1.append({'titulo':aulamagna_1.val()['titulo'],'descripcion':aulamagna_1.val()['descripcion'],'img':aulamagna_1.val()['img']})
-    dict_am_2.append({'titulo':aulamagna_2.val()['titulo'],'descripcion':aulamagna_2.val()['descripcion'],'img':aulamagna_2.val()['img']})
-    dict_m_1.append({'titulo':menu_principal_1.val()['titulo'],'descripcion':menu_principal_1.val()['descripcion'],'img':menu_principal_1.val()['img']})
-    dict_m_2.append({'titulo':menu_principal_2.val()['titulo'],'descripcion':menu_principal_2.val()['descripcion'],'img':menu_principal_2.val()['img']})
-
-    print(dict_au_1)
-    print(dict_au_2)
-    print(dict_cal2)
-    print(dict_cal1)
     context = {
-        'menu_1':dict_m_1,
-        'menu_2':dict_m_2,
-        'calafornix_1':dict_cal1,
-        'calafornix_2':dict_cal2,
-        'aulamagna_1':dict_am_1,
-        'aulamagna_2':dict_am_2,
-        'audiovisual_1':dict_au_1,
-        'audiovisual_2':dict_au_2
     }
 
     return render(request,"index-copy.html",context)
